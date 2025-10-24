@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, CheckCircle2, XCircle, Activity, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -64,12 +64,19 @@ export const StockStatus = () => {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <Card className="w-full max-w-md">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-center space-x-2">
-              <RefreshCw className="h-5 w-5 animate-spin text-muted-foreground" />
-              <span className="text-muted-foreground">Loading stock data...</span>
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background to-secondary/20 p-4">
+        <Card className="w-full max-w-md shadow-2xl animate-scale-in">
+          <CardContent className="pt-8 pb-8">
+            <div className="flex flex-col items-center justify-center space-y-4">
+              <div className="relative">
+                <RefreshCw className="h-12 w-12 animate-spin text-primary" />
+                <div className="absolute inset-0 h-12 w-12 animate-ping opacity-20">
+                  <RefreshCw className="h-12 w-12 text-primary" />
+                </div>
+              </div>
+              <span className="text-lg font-medium text-muted-foreground animate-pulse">
+                Loading stock data...
+              </span>
             </div>
           </CardContent>
         </Card>
@@ -79,15 +86,22 @@ export const StockStatus = () => {
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <Card className="w-full max-w-md border-destructive/50">
-          <CardHeader>
-            <CardTitle className="text-destructive">Error</CardTitle>
-            <CardDescription>{error}</CardDescription>
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background to-secondary/20 p-4">
+        <Card className="w-full max-w-md border-destructive/50 shadow-2xl animate-scale-in">
+          <CardHeader className="text-center pb-3">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
+              <XCircle className="h-10 w-10 text-destructive" />
+            </div>
+            <CardTitle className="text-2xl text-destructive">Connection Error</CardTitle>
+            <CardDescription className="text-base">{error}</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button onClick={handleManualRefresh} variant="outline" className="w-full">
-              <RefreshCw className="mr-2 h-4 w-4" />
+            <Button 
+              onClick={handleManualRefresh} 
+              className="w-full h-12 text-base font-medium"
+              variant="outline"
+            >
+              <RefreshCw className="mr-2 h-5 w-5" />
               Try Again
             </Button>
           </CardContent>
@@ -97,60 +111,92 @@ export const StockStatus = () => {
   }
 
   const isAvailable = stockData?.available === 1;
-  const statusColor = isAvailable ? "hsl(var(--success))" : "hsl(var(--unavailable))";
-  const statusText = isAvailable ? "Available" : "Not Available";
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Stock Status</CardTitle>
-          <CardDescription>Real-time inventory availability</CardDescription>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background to-secondary/20 p-4">
+      <Card className="w-full max-w-md shadow-2xl animate-fade-in" style={{ boxShadow: 'var(--shadow-card)' }}>
+        <CardHeader className="text-center pb-6 space-y-2">
+          <div className="mx-auto mb-2 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 animate-scale-in">
+            <Activity className="h-8 w-8 text-primary animate-pulse" />
+          </div>
+          <CardTitle className="text-3xl font-bold tracking-tight">Stock Monitor</CardTitle>
+          <CardDescription className="text-base">Real-time inventory availability</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        
+        <CardContent className="space-y-8 pb-8">
+          {/* Main Status Display */}
           <div
-            className="rounded-lg p-8 text-center transition-all duration-300"
+            className="relative overflow-hidden rounded-2xl p-10 text-center transition-all duration-500 animate-slide-up"
             style={{
-              backgroundColor: `${statusColor}15`,
-              borderWidth: "2px",
-              borderColor: statusColor,
+              background: isAvailable 
+                ? 'var(--gradient-success)' 
+                : 'var(--gradient-unavailable)',
+              boxShadow: isAvailable 
+                ? 'var(--shadow-success)' 
+                : 'var(--shadow-unavailable)',
             }}
           >
-            <div className="mb-2 text-sm font-medium text-muted-foreground">
-              Current Status
-            </div>
-            <div
-              className="text-4xl font-bold"
-              style={{ color: statusColor }}
-            >
-              {statusText}
+            {/* Animated background circles */}
+            <div className="absolute top-0 right-0 h-32 w-32 rounded-full bg-white/10 animate-pulse-slow -mr-16 -mt-16" />
+            <div className="absolute bottom-0 left-0 h-24 w-24 rounded-full bg-white/10 animate-pulse-slow -ml-12 -mb-12" style={{ animationDelay: '1s' }} />
+            
+            {/* Content */}
+            <div className="relative z-10">
+              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm animate-bounce-subtle">
+                {isAvailable ? (
+                  <CheckCircle2 className="h-12 w-12 text-white" strokeWidth={2.5} />
+                ) : (
+                  <XCircle className="h-12 w-12 text-white" strokeWidth={2.5} />
+                )}
+              </div>
+              
+              <div className="mb-2 text-sm font-semibold uppercase tracking-wider text-white/90">
+                Current Status
+              </div>
+              
+              <div className="text-5xl font-black text-white drop-shadow-lg">
+                {isAvailable ? "Available" : "Not Available"}
+              </div>
+              
+              {isAvailable && (
+                <div className="mt-4 text-sm font-medium text-white/80">
+                  Ready to ship
+                </div>
+              )}
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>
-              Last updated: {new Date(stockData?.updated_at || "").toLocaleTimeString()}
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-green-500" />
-              Auto-refresh: 10s
-            </span>
+          {/* Status Info Bar */}
+          <div className="flex items-center justify-between rounded-xl bg-muted/50 px-4 py-3 backdrop-blur-sm">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Clock className="h-4 w-4" />
+              <span className="font-medium">
+                {new Date(stockData?.updated_at || "").toLocaleTimeString()}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-success" />
+              <span className="text-xs font-medium text-muted-foreground">
+                Auto-refresh: 10s
+              </span>
+            </div>
           </div>
 
+          {/* Refresh Button */}
           <Button
             onClick={handleManualRefresh}
             disabled={isRefreshing}
-            variant="outline"
-            className="w-full"
+            className="w-full h-14 text-base font-semibold shadow-lg transition-all duration-300 hover:scale-105"
+            size="lg"
           >
             {isRefreshing ? (
               <>
-                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                <RefreshCw className="mr-2 h-5 w-5 animate-spin" />
                 Refreshing...
               </>
             ) : (
               <>
-                <RefreshCw className="mr-2 h-4 w-4" />
+                <RefreshCw className="mr-2 h-5 w-5" />
                 Refresh Now
               </>
             )}
